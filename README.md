@@ -138,7 +138,7 @@ Right after the _BEGIN_ statement, you should assign to a variable the current `
 
 :bulb: You can repeat the process every time you need to set a "checkpoint" on your program code. Don't worry, `p_oralog` is smart enough to update the record for this specific job instance running every time a checkpoint is added :smiley:
 
-You should also include a call before the end of your procedure to allow for loggint of last execution time. Also, as you see on example, there is an additional call is an exception is raised by the DB engine, this will log the current time and the aproximate line where the error was raised, very useful for long and complex programs!
+You should also include a call before the end of your procedure to allow for logging of last execution time. Also, as you see on example, there is an additional call is an exception if raised by the DB engine, this will log the current time and the aproximate line where the error was raised, very useful for long and complex programs!
 
 NOTE: DB lock is there to simulate a long running operation or group of operations.
 
@@ -160,6 +160,8 @@ FROM ORALOG
 WHERE JOB_NAME = 'YOUR_PROCEDURE_NAME'
 ORDER BY 2 DESC;
 ```
+
+Ideally, you should do this while your procedure is runnig. It´s safe to also query afterwards anyway.
 
 ## Issues
 
