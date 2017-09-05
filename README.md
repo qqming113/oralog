@@ -136,7 +136,7 @@ end;
 
 Right after the _BEGIN_ statement, you should assign to a variable the current `sysdate` and execute a call to `p_oralog`. This will log to `oralog` table a new job and the exact time it started running.
 
-:bulb: You can repeat the process every time you need to set a "checkpoint" on your program code. Don't worry, `p_oralog` will update is smart enough to update the record for this specific job instance every time a checkpoint is added :smiley:
+:bulb: You can repeat the process every time you need to set a "checkpoint" on your program code. Don't worry, `p_oralog` is smart enough to update the record for this specific job instance running every time a checkpoint is added :smiley:
 
 You should also include a call before the end of your procedure to allow for loggint of last execution time. Also, as you see on example, there is an additional call is an exception is raised by the DB engine, this will log the current time and the aproximate line where the error was raised, very useful for long and complex programs!
 
