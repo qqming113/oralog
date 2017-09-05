@@ -21,6 +21,7 @@ This utility is (currently) designed to run as a sandbox for objects within the 
 
 :four: Install stored procedure
 
+Please see "SQL" folder with source code for prerequisites
 
 ## Clone this project
 
@@ -69,7 +70,7 @@ BEGIN
 
     v_end_date := sysdate;
     v_comment_ := 'Starting '||to_char(P_DATE,'YYYY-MM-DD');
-    p_job_log (v_job_name
+    p_oralog (v_job_name
                   ,v_start_date
                   ,v_end_date
                   ,v_comment_
@@ -93,7 +94,7 @@ BEGIN
     v_end_date := sysdate;
     v_successfull := 'Y';
     v_comment_ := 'Ended OK '||to_char(P_DATE,'YYYY-MM-DD');
-    p_job_log (v_job_name
+    p_oralog (v_job_name
                   ,v_start_date
                   ,v_end_date
                   ,v_comment_
@@ -112,7 +113,7 @@ BEGIN
 exception when others then
   v_end_date := sysdate;
   v_comment_ := (v_comment_ ||DBMS_UTILITY.format_error_backtrace || ' ' || sqlcode || ' ' || sqlerrm);
-  p_job_log (v_job_name
+  p_oralog (v_job_name
                 ,v_start_date
                 ,v_end_date
                 ,v_comment_
@@ -133,11 +134,38 @@ end;
 
 ```
 
+Right after the _BEGIN_ statement, you should assign to a variable the current `sysdate` and execute a call to `p_oralog`. This will log to `oralog` table a new job and the exact time it started running.
+
+:bulb: You can repeat the process every time you need to set a "checkpoint" on your program code. Don't worry, `p_oralog` will update is smart enough to update the record for this specific job instance every time a checkpoint is added :smiley:
+
+You should also include a call before the end of your procedure to allow for loggint of last execution time. Also, as you see on example, there is an additional call is an exception is raised by the DB engine, this will log the current time and the aproximate line where the error was raised, very useful for long and complex programs!
+
+NOTE: DB lock is there to simulate a long running operation or group of operations.
+
 ## Monitoring via SQL (AKA querying jobs)
 
+If you run the sample above or your own procedures with the suggested code, you only need to:
 
+```sql
+SELECT *
+FROM ORALOG
+WHERE JOB_NAME = 'YOUR_PROCEDURE_NAME'
+```
+
+_Or_
+
+```sql
+SELECT JOB_NAME, START_DATE, END_DATE, COMMENT_, SUCCESSFULL
+FROM JOB_LOG
+WHERE JOB_NAME = 'YOUR_PROCEDURE_NAME'
+ORDER BY 2 DESC;
+```
+
+## Issues
+
+It doesn't work so well when subprograms are called from your main procedure (unless you also implement this on your subprograms :wink: )
 
 ## Have fun! :sunglasses:
 
-Please report any issues you may encounter
+Please :pray: report any issues you may encounter
 
