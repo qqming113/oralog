@@ -1,9 +1,21 @@
 --------------------------------------------------------
 --  DDL for Procedure P_ORALOG
 --------------------------------------------------------
+
+/*******************************************************
+
+  DESCRIPTION:      Receives a number of parameters from outside and marks the
+                    main table with the execution details in a specific point
+                    in time
+  INPUT PARAMS:     N/A
+  OUTPUT PARAMS:    N/A
+  COMMENTS:
+
+********************************************************/
+
 set define off;
 
-  CREATE OR REPLACE PROCEDURE "P_ORALOG" 
+  CREATE OR REPLACE PROCEDURE "P_ORALOG"
 (
         V_JOB_NAME                  IN VARCHAR2,
         V_START_DATE                IN DATE,
@@ -21,7 +33,7 @@ set define off;
         V_DATA_DATE                 IN DATE DEFAULT NULL
 ) IS
 
-
+--Query for a specific job
 CURSOR C_JOB IS
 SELECT *
   FROM JOB
@@ -29,6 +41,7 @@ SELECT *
 
 V_JOB JOB%ROWTYPE;
 
+--Query for a specific job and start moment
 CURSOR C_JOB_LOG IS
 SELECT *
   FROM ORALOG
@@ -42,6 +55,7 @@ BEGIN
 OPEN C_JOB;
 FETCH C_JOB INTO V_JOB;
 
+--When a new job is found, insert into control table
 IF V_JOB.JOB_NAME IS NULL THEN
   INSERT INTO JOB (JOB_NAME, ETL, SUBJECT_AREA)
   VALUES (V_JOB_NAME, V_ETL, 'TBD');
@@ -53,6 +67,7 @@ CLOSE C_JOB;
 OPEN C_JOB_LOG;
 FETCH C_JOB_LOG INTO V_JOB_LOG;
 
+--When new job, insert into main logging table
 IF V_JOB_LOG.JOB_NAME IS NULL THEN
 
 
@@ -91,6 +106,7 @@ IF V_JOB_LOG.JOB_NAME IS NULL THEN
      V_DATA_DATE);
 ELSE
 
+  --If job already exists, update with most current details
   UPDATE ORALOG
   SET
      END_DATE=V_END_DATE,
